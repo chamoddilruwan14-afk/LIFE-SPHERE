@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LifeSphere V2</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+--bg:#050505;
+--glass:rgba(255,255,255,.06);
+--blue:#4CC9F0;
+--gold:#FFD166;
+--text:#fff;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:Inter,sans-serif;
+background:var(--bg);
+color:var(--text);
+overflow-x:hidden;
+}
+
+/* LOADER */
+
+#loader{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#050505;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:999999;
+}
+
+.loader-content{
+text-align:center;
+}
+
+.loader-planet{
+width:150px;
+height:150px;
+border-radius:50%;
+background:
+radial-gradient(circle at 30% 30%,
+#4CC9F0,
+#09141a);
+
+box-shadow:
+0 0 40px #4CC9F0,
+0 0 90px rgba(76,201,240,.6);
+
+animation:spinPlanet 4s linear infinite;
+margin:auto;
+}
+
+.loader-title{
+font-family:Orbitron,sans-serif;
+font-size:2.5rem;
+letter-spacing:8px;
+margin-top:20px;
+
+background:linear-gradient(
+90deg,
+#4CC9F0,
+#FFD166
+);
+
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.loader-bar{
+width:300px;
+height:10px;
+background:rgba(255,255,255,.1);
+border-radius:20px;
+overflow:hidden;
+margin:20px auto;
+}
+
+.loader-fill{
+height:100%;
+width:0;
+background:linear-gradient(
+90deg,
+#4CC9F0,
+#FFD166
+);
+animation:loadBar 4s linear forwards;
+}
+
+@keyframes loadBar{
+from{width:0}
+to{width:100%}
+}
+
+@keyframes spinPlanet{
+from{transform:rotate(0deg)}
+to{transform:rotate(360deg)}
+}
+
+#mainContent{
+display:none;
+opacity:0;
+}
+
+/* ORIGINAL STYLES */
+
+.aurora{
+position:fixed;
+inset:0;
+z-index:-3;
+
+background:
+radial-gradient(circle at 20% 20%,rgba(76,201,240,.18),transparent 35%),
+radial-gradient(circle at 80% 70%,rgba(255,209,102,.12),transparent 35%);
+
+filter:blur(40px);
+
+animation:aurora 12s ease-in-out infinite alternate;
+}
+
+@keyframes aurora{
+from{transform:translateY(-30px)}
+to{transform:translateY(30px)}
+}
+
+#stars{
+position:fixed;
+inset:0;
+z-index:-2;
+}
+
+.cursor{
+position:fixed;
+width:180px;
+height:180px;
+border-radius:50%;
+background:radial-gradient(circle,rgba(76,201,240,.15),transparent 70%);
+pointer-events:none;
+transform:translate(-50%,-50%);
+z-index:-1;
+}
+
+nav{
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+background:var(--glass);
+backdrop-filter:blur(18px);
+padding:14px 24px;
+border-radius:50px;
+border:1px solid rgba(255,255,255,.1);
+display:flex;
+gap:20px;
+z-index:10;
+}
+
+nav a{
+color:#fff;
+text-decoration:none;
+}
+
+.hero{
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:30px;
+}
+
+.panel{
+background:var(--glass);
+backdrop-filter:blur(20px);
+border-radius:32px;
+padding:50px;
+width:min(1100px,95%);
+border:1px solid rgba(255,255,255,.08);
+box-shadow:0 20px 80px rgba(0,0,0,.5);
+text-align:center;
+}
+
+h1{
+font-family:Orbitron,sans-serif;
+font-size:clamp(3rem,8vw,6rem);
+letter-spacing:4px;
+}
+
+.sub{
+color:#d6d6d6;
+margin:20px 0;
+}
+.btn{
+display:inline-block;
+padding:14px 30px;
+margin:8px;
+border-radius:40px;
+background:linear-gradient(90deg,var(--blue),var(--gold));
+color:#000;
+text-decoration:none;
+font-weight:700;
+}
+
+.dna{
+height:220px;
+position:relative;
+margin:20px auto;
+width:140px;
+}
+
+.dna::before,
+.dna::after{
+content:"";
+position:absolute;
+top:0;
+width:6px;
+height:100%;
+background:linear-gradient(var(--blue),var(--gold));
+border-radius:10px;
+animation:spin 5s linear infinite;
+}
+
+.dna::before{
+left:35px;
+}
+
+.dna::after{
+right:35px;
+animation-direction:reverse;
+}
+
+@keyframes spin{
+to{
+transform:rotateY(360deg);
+}
+}
+
+section{
+padding:80px 5%;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:24px;
+}
+
+.card{
+background:var(--glass);
+border-radius:24px;
+padding:30px;
+position:relative;
+overflow:hidden;
+border:1px solid rgba(255,255,255,.08);
+transition:.4s;
+}
+
+.card:before{
+content:"";
+position:absolute;
+top:-100%;
+left:-50%;
+width:50%;
+height:300%;
+background:rgba(255,255,255,.08);
+transform:rotate(25deg);
+transition:.6s;
+}
+
+.card:hover:before{
+left:150%;
+}
+
+.card:hover{
+transform:translateY(-10px);
+}
+
+.stats .card{
+text-align:center;
+}
+
+.num{
+font-size:3rem;
+font-family:Orbitron;
+}
+
+@keyframes rotate{
+to{
+transform:rotate(360deg);
+}
+}
+
+footer{
+text-align:center;
+padding:80px 20px;
+color:#aaa;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+
+<div class="loader-content">
+
+<div class="loader-planet"></div>
+
+<h1 class="loader-title">
+LIFESPHERE
+</h1>
+
+<div class="loader-bar">
+<div class="loader-fill"></div>
+</div>
+
+<p style="color:#ccc">
+Loading The World Of Life...
+</p>
+
+</div>
+
+</div>
+
+<!-- HIDDEN CONTENT -->
+<div id="mainContent">
+
+<div class="aurora"></div>
+
+<canvas id="stars"></canvas>
+
+<div class="cursor" id="cursor"></div>
+
+<section class="hero">
+
+<div class="panel">
+
+<div class="dna"></div>
+
+<h1>
+THE WORLD OF LIFE
+</h1>
+
+<p class="sub">
+Grade 10 Science • English Medium
+</p>
+
+<a class="btn" href="notes.html">
+ENTER
+</a>
+
+<a class="btn" href="#">
+EXPLORE
+</a>
+
+</div>
+
+</section>
+
+<section>
+
+<div class="grid">
+
+<div class="card">
+<h3>NOTES</h3>
+</div>
+
+<div class="card">
+<h3>VIDEOS</h3>
+</div>
+
+<div class="card">
+<h3>QUIZZES</h3>
+</div>
+
+<div class="card">
+<h3>GAMES</h3>
+</div>
+
+<div class="card">
+<h3>PROGRESS</h3>
+</div>
+
+</div>
+
+</section>
+
+<section class="stats">
+
+<div class="grid">
+
+<div class="card">
+<div class="num">120+</div>
+Images
+</div>
+
+<div class="card">
+<div class="num">50+</div>
+Quizzes
+</div>
+
+<div class="card">
+<div class="num">20+</div>
+Videos
+</div>
+
+<div class="card">
+<div class="num">10</div>
+Games
+</div>
+
+</div>
+
+</section>
+
+<nav>
+<a href="#">Home</a>
+<a href="#">Notes</a>
+<a href="#">Videos</a>
+ <a href="LifeSphere_Quiz.html">Quiz</a>
+<a href="#">Games</a>
+</nav>
+
+</div>
+<!-- END mainContent -->
+
+<script>
+
+/* ==========================
+   LOADER
+========================== */
+
+window.addEventListener("load",function(){
+
+setTimeout(function(){
+
+const loader=document.getElementById("loader");
+const main=document.getElementById("mainContent");
+
+loader.style.transition="opacity 1s ease";
+loader.style.opacity="0";
+
+setTimeout(function(){
+
+loader.style.display="none";
+
+main.style.display="block";
+
+setTimeout(function(){
+
+main.style.transition="opacity 1s ease";
+main.style.opacity="1";
+
+},50);
+
+},1000);
+
+},4000);
+
+});
+
+/* ==========================
+   CURSOR GLOW
+========================== */
+
+const c=document.getElementById("cursor");
+
+document.addEventListener("mousemove",e=>{
+
+c.style.left=e.clientX+"px";
+c.style.top=e.clientY+"px";
+
+});
+
+/* ==========================
+   STARS
+========================== */
+
+const canvas=document.getElementById("stars");
+const ctx=canvas.getContext("2d");
+
+function resize(){
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+}
+
+resize();
+
+window.addEventListener("resize",resize);
+
+const stars=Array.from(
+{length:180},
+()=>({
+x:Math.random()*window.innerWidth,
+y:Math.random()*window.innerHeight,
+r:Math.random()*2
+})
+);
+
+function draw(){
+
+ctx.clearRect(
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+ctx.fillStyle="white";
+
+stars.forEach(s=>{
+
+ctx.beginPath();
+
+ctx.arc(
+s.x,
+s.y,
+s.r,
+0,
+Math.PI*2
+);
+
+ctx.fill();
+
+});
+
+requestAnimationFrame(draw);
+
+}
+
+draw();
+
+/* ==========================
+   LOADING TEXT ANIMATION
+========================== */
+
+const messages=[
+"Initializing Biology Systems...",
+"Loading Grade 10 Science...",
+"Preparing Animations...",
+"Generating LifeSphere...",
+"Welcome To The World Of Life..."
+];
+
+let current=0;
+
+const loaderText=document.querySelector("#loader p");
+
+setInterval(()=>{
+
+if(loaderText){
+
+current++;
+
+if(current>=messages.length){
+current=0;
+}
+
+loaderText.textContent=messages[current];
+
+}
+
+},700);
+
+</script>
+
+</body>
+</html>

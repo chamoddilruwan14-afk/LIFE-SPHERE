@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeSphere Quiz </title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+--bg:#050505;
+--glass:rgba(255,255,255,.07);
+--blue:#4CC9F0;
+--gold:#FFD166;
+--white:#ffffff;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Inter',sans-serif;
+background:var(--bg);
+color:white;
+overflow-x:hidden;
+}
+
+/* LOADER */
+
+#loader{
+position:fixed;
+inset:0;
+background:#000;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:999999;
+}
+
+.loader-content{
+text-align:center;
+}
+
+.planet{
+width:180px;
+height:180px;
+border-radius:50%;
+background:
+radial-gradient(circle at 30% 30%,
+#4CC9F0,
+#07141d);
+animation:spin 5s linear infinite;
+
+box-shadow:
+0 0 50px #4CC9F0,
+0 0 120px rgba(76,201,240,.5);
+}
+
+@keyframes spin{
+from{transform:rotate(0deg)}
+to{transform:rotate(360deg)}
+}
+
+.loader-title{
+font-family:Orbitron;
+font-size:3rem;
+letter-spacing:8px;
+margin-top:20px;
+background:linear-gradient(90deg,#4CC9F0,#FFD166);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.bar{
+width:300px;
+height:12px;
+background:#111;
+margin:20px auto;
+border-radius:50px;
+overflow:hidden;
+}
+
+.fill{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#4CC9F0,#FFD166);
+animation:load 4s forwards;
+}
+
+@keyframes load{
+to{width:100%}
+}
+
+/* MAIN */
+
+#app{
+display:block;
+}
+
+.aurora{
+position:fixed;
+inset:0;
+z-index:-2;
+
+background:
+radial-gradient(circle at 20% 20%,rgba(76,201,240,.15),transparent 40%),
+radial-gradient(circle at 80% 80%,rgba(255,209,102,.10),transparent 40%);
+filter:blur(50px);
+}
+
+canvas{
+position:fixed;
+inset:0;
+z-index:-1;
+}
+
+header{
+padding:30px;
+text-align:center;
+}
+
+header h1{
+font-family:Orbitron;
+font-size:3rem;
+}
+
+.quiz-container{
+max-width:1000px;
+margin:auto;
+padding:20px;
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:15px;
+margin-bottom:20px;
+}
+
+.stat{
+background:var(--glass);
+padding:20px;
+border-radius:20px;
+text-align:center;
+backdrop-filter:blur(15px);
+}
+
+.stat h3{
+font-size:2rem;
+color:var(--gold);
+}
+
+.progress{
+height:18px;
+background:#111;
+border-radius:50px;
+overflow:hidden;
+margin-bottom:20px;
+}
+
+.progress-fill{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#4CC9F0,#FFD166);
+transition:.5s;
+}
+
+.card{
+background:var(--glass);
+padding:30px;
+border-radius:30px;
+backdrop-filter:blur(20px);
+border:1px solid rgba(255,255,255,.08);
+}
+
+.question{
+font-size:1.4rem;
+margin-bottom:20px;
+}
+
+.option{
+width:100%;
+padding:15px;
+margin:10px 0;
+border:none;
+border-radius:15px;
+cursor:pointer;
+font-size:1rem;
+background:#111;
+color:white;
+transition:.3s;
+}
+
+.option:hover{
+background:#222;
+transform:translateY(-2px);
+}
+
+.correct{
+background:#22c55e !important;
+}
+
+.wrong{
+background:#ef4444 !important;
+}
+
+#explanation{
+margin-top:20px;
+padding:20px;
+border-radius:20px;
+display:none;
+background:rgba(255,255,255,.05);
+}
+
+.next-btn{
+margin-top:20px;
+padding:15px 30px;
+border:none;
+border-radius:50px;
+cursor:pointer;
+font-weight:bold;
+background:linear-gradient(90deg,#4CC9F0,#FFD166);
+}
+
+.result{
+display:none;
+text-align:center;
+}
+
+.rank{
+font-size:2rem;
+color:gold;
+margin:20px;
+}
+#intro{
+position:fixed;
+inset:0;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+background:#050505;
+z-index:9999;
+animation:introFade 3s forwards;
+}
+
+.quiz-logo{
+font-size:120px;
+animation:pulse 1.5s infinite;
+}
+
+#intro h1{
+font-family:Orbitron;
+font-size:4rem;
+margin-top:20px;
+background:linear-gradient(90deg,#4CC9F0,#FFD166);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+#intro p{
+margin-top:10px;
+font-size:1.2rem;
+color:#aaa;
+}
+
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.2);}
+100%{transform:scale(1);}
+}
+
+@keyframes introFade{
+0%,80%{
+opacity:1;
+}
+100%{
+opacity:0;
+visibility:hidden;
+}
+}
+
+.show-app{
+animation:appReveal 1s ease;
+}
+
+@keyframes appReveal{
+from{
+opacity:0;
+transform:translateY(30px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+</style>
+</head>
+<body>
+
+
+
+<div id="app" class="show-app">
+
+<div class="aurora"></div>
+<canvas id="stars"></canvas>
+
+<header>
+<h1>LifeSphere Quiz</h1>
+<p>Grade 10 Science</p>
+</header>
+
+<div class="quiz-container">
+
+<div class="stats">
+
+<div class="stat">
+<h3 id="score">0</h3>
+Score
+</div>
+
+<div class="stat">
+<h3 id="xp">0</h3>
+XP
+</div>
+
+<div class="stat">
+<h3 id="qnum">1</h3>
+Question
+</div>
+
+<div class="stat">
+<h3 id="rank">Beginner</h3>
+Rank
+</div>
+
+</div>
+
+<div class="progress">
+<div class="progress-fill" id="progress"></div>
+</div>
+
+<div class="card">
+
+<div id="quizArea">
+
+<h2 class="question" id="question"></h2>
+
+<div id="options"></div>
+
+<div id="explanation"></div>
+
+<button class="next-btn"
+onclick="nextQuestion()">
+Next Question
+</button>
+
+</div>
+
+<div class="result" id="result">
+
+<h1>QUIZ COMPLETE</h1>
+
+<h2 id="finalScore"></h2>
+
+<h2 id="accuracy"></h2>
+
+<div class="rank" id="finalRank"></div>
+
+<button class="next-btn"
+onclick="location.reload()">
+Restart Quiz
+</button>
+
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+
+
+/* STARS */
+
+const canvas=document.getElementById("stars");
+const ctx=canvas.getContext("2d");
+
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+
+let stars=[];
+
+for(let i=0;i<200;i++){
+stars.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*2
+});
+}
+
+function animateStars(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+ctx.fillStyle="white";
+
+stars.forEach(s=>{
+ctx.beginPath();
+ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+ctx.fill();
+});
+
+requestAnimationFrame(animateStars);
+}
+
+animateStars();
+
+/* QUIZ DATA */
+const quiz=[
+
+{
+q:"Which class do frogs belong to?",
+o:["Pisces","Reptilia","Amphibia","Mammalia"],
+a:2,
+e:"Frogs belong to Amphibia because they live both in water and on land."
+},
+
+{
+q:"Which scientist introduced Binomial Nomenclature?",
+o:["Darwin","Mendel","Carolus Linnaeus","Pasteur"],
+a:2,
+e:"Carolus Linnaeus introduced binomial nomenclature in 1753."
+},
+
+{
+q:"Which kingdom contains fungi?",
+o:["Animalia","Fungi","Protista","Plantae"],
+a:1,
+e:"All fungi belong to Kingdom Fungi."
+},
+
+{
+q:"Which vertebrate class contains birds?",
+o:["Mammalia","Aves","Reptilia","Pisces"],
+a:1,
+e:"Birds belong to class Aves."
+},
+
+{
+q:"Which class includes humans?",
+o:["Reptilia","Mammalia","Amphibia","Pisces"],
+a:1,
+e:"Humans are mammals because they possess mammary glands."
+},
+
+{
+q:"What is the first part of a scientific name?",
+o:["Species","Class","Genus","Family"],
+a:2,
+e:"The first word of a scientific name is the genus."
+},
+
+{
+q:"Which reproduction needs only one parent?",
+o:["Sexual","Asexual","Fertilization","Pollination"],
+a:1,
+e:"Asexual reproduction involves only one parent."
+},
+
+{
+q:"Which structure is used for sexual reproduction in plants?",
+o:["Leaf","Stem","Flower","Root"],
+a:2,
+e:"Flowers contain male and female reproductive structures."
+},
+
+{
+q:"Which part produces pollen?",
+o:["Petal","Stigma","Anther","Ovary"],
+a:2,
+e:"Anthers contain pollen sacs."
+},
+
+{
+q:"Which part contains ovules?",
+o:["Style","Petal","Ovary","Sepal"],
+a:2,
+e:"Ovules are found inside the ovary."
+},
+
+{
+q:"Pollination means...",
+o:["Seed formation","Transfer of pollen","Fertilization","Fruit formation"],
+a:1,
+e:"Pollination is the transfer of pollen to the stigma."
+},
+
+{
+q:"Self pollination occurs in...",
+o:["Same flower","Different species","Different kingdom","Roots"],
+a:0,
+e:"Self pollination occurs within the same flower."
+},
+
+{
+q:"Which agent pollinates coconut?",
+o:["Animals","Water","Wind","Humans"],
+a:2,
+e:"Coconut is mainly wind pollinated."
+},
+
+{
+q:"Which flower is pollinated by water?",
+o:["Rose","Vallisneria","Sunflower","Mango"],
+a:1,
+e:"Vallisneria is a hydrophilous flower."
+},
+
+{
+q:"Fusion of gametes is called...",
+o:["Pollination","Germination","Fertilization","Budding"],
+a:2,
+e:"Fertilization is the fusion of male and female gametes."
+},
+
+{
+q:"After fertilization ovary becomes...",
+o:["Leaf","Seed","Fruit","Root"],
+a:2,
+e:"The ovary develops into a fruit."
+},
+
+{
+q:"Dispersal helps plants by...",
+o:["Reducing diversity","Increasing competition","Finding new habitats","Stopping growth"],
+a:2,
+e:"Dispersal allows plants to occupy new habitats."
+},
+
+{
+q:"Coconut is dispersed by...",
+o:["Wind","Water","Animals","Explosion"],
+a:1,
+e:"Coconut has a fibrous pericarp suitable for floating."
+},
+
+{
+q:"Cotton seeds are dispersed by...",
+o:["Wind","Water","Animals","Humans"],
+a:0,
+e:"Cotton seeds possess fibers aiding wind dispersal."
+},
+
+{
+q:"Rubber fruits disperse seeds by...",
+o:["Animals","Wind","Explosion","Water"],
+a:2,
+e:"Rubber fruits burst open explosively."
+},
+
+{
+q:"Which is essential for germination?",
+o:["Oxygen","Water","Temperature","All"],
+a:3,
+e:"Seeds require oxygen, water and suitable temperature."
+},
+
+{
+q:"Seed dormancy is...",
+o:["Rapid growth","Failure to germinate","Flowering","Pollination"],
+a:1,
+e:"Dormant seeds do not germinate even under suitable conditions."
+},
+
+{
+q:"Puberty in boys usually begins between...",
+o:["5-8","8-10","13-16","20-25"],
+a:2,
+e:"Male puberty commonly starts around 13-16 years."
+},
+
+{
+q:"Which hormone controls male secondary sexual characteristics?",
+o:["Oestrogen","Progesterone","Testosterone","Insulin"],
+a:2,
+e:"Testosterone causes male secondary sexual characteristics."
+},
+
+{
+q:"Which hormone controls female secondary sexual characteristics?",
+o:["Adrenaline","Progesterone and Oestrogen","Insulin","Thyroxine"],
+a:1,
+e:"Oestrogen and Progesterone regulate female puberty."
+},
+{
+q:"What is the main function of testes?",
+o:["Produce ova","Produce sperms","Produce blood","Produce urine"],
+a:1,
+e:"Testes are the male reproductive organs that produce sperms."
+},
+
+{
+q:"Where are testes located?",
+o:["Abdomen","Scrotum","Chest","Kidney"],
+a:1,
+e:"The testes are located inside the scrotum."
+},
+
+{
+q:"Which structure produces sperm mother cells?",
+o:["Epididymis","Seminiferous tubules","Scrotum","Urethra"],
+a:1,
+e:"Seminiferous tubules inside the testes produce sperm cells."
+},
+
+{
+q:"Which class contains whales?",
+o:["Pisces","Mammalia","Reptilia","Aves"],
+a:1,
+e:"Whales are mammals because they breathe air and feed milk to their young."
+},
+
+{
+q:"Which class contains penguins?",
+o:["Mammalia","Amphibia","Aves","Reptilia"],
+a:2,
+e:"Penguins belong to class Aves even though they cannot fly."
+},
+
+{
+q:"Which characteristic is found in reptiles?",
+o:["Feathers","Moist skin","Scales","Fur"],
+a:2,
+e:"Reptiles possess dry skin covered with scales."
+},
+
+{
+q:"Which vertebrate group is cold blooded?",
+o:["Mammals","Birds","Reptiles","Both reptiles and amphibians"],
+a:3,
+e:"Reptiles and amphibians are cold-blooded animals."
+},
+
+{
+q:"Which vertebrate group is warm blooded?",
+o:["Amphibia","Reptilia","Mammalia and Aves","Pisces"],
+a:2,
+e:"Birds and mammals maintain a constant body temperature."
+},
+
+{
+q:"Which kingdom contains plants?",
+o:["Animalia","Protista","Fungi","Plantae"],
+a:3,
+e:"All plants belong to Kingdom Plantae."
+},
+
+{
+q:"Which domain contains bacteria?",
+o:["Archaea","Bacteria","Eukarya","Animalia"],
+a:1,
+e:"Bacteria belong to Domain Bacteria."
+},
+
+{
+q:"What is the scientific name of humans?",
+o:["Pan troglodytes","Homo erectus","Homo sapiens","Homo habilis"],
+a:2,
+e:"Humans are scientifically known as Homo sapiens."
+},
+
+{
+q:"What is the scientific name of coconut?",
+o:["Cocos nucifera","Mangifera indica","Nymphaea stellata","Mesua nagassarium"],
+a:0,
+e:"The scientific name of coconut is Cocos nucifera."
+},
+
+{
+q:"What is the scientific name of mango?",
+o:["Mangifera indica","Cocos nucifera","Homo sapiens","Elephas maximus"],
+a:0,
+e:"Mangifera indica is the scientific name of mango."
+},
+
+{
+q:"What type of reproduction occurs through spores?",
+o:["Sexual","Asexual","Fertilization","Pollination"],
+a:1,
+e:"Spore formation is a type of asexual reproduction."
+},
+
+{
+q:"Which underground stem is seen in ginger?",
+o:["Bulb","Corm","Rhizome","Tuber"],
+a:2,
+e:"Ginger reproduces through a rhizome."
+},
+
+{
+q:"Which underground stem is seen in onion?",
+o:["Bulb","Corm","Rhizome","Tuber"],
+a:0,
+e:"Onion is an example of a bulb."
+},
+
+{
+q:"Which underground stem is seen in potato?",
+o:["Corm","Bulb","Tuber","Rhizome"],
+a:2,
+e:"Potato is a stem tuber."
+},
+
+{
+q:"Which artificial propagation method uses twigs?",
+o:["Grafting","Tissue culture","Layering","Seed propagation"],
+a:0,
+e:"Grafting commonly uses twigs or buds."
+},
+
+{
+q:"Which propagation method develops roots while attached to the mother plant?",
+o:["Cutting","Layering","Tissue culture","Seeding"],
+a:1,
+e:"Layering allows roots to develop while still attached."
+},
+
+{
+q:"Which type of layering is done above the ground?",
+o:["Ground layering","Aerial layering","Water layering","Root layering"],
+a:1,
+e:"Aerial layering is carried out on branches above ground."
+},
+
+{
+q:"What is the rooted part in grafting called?",
+o:["Scion","Bud","Stock","Twig"],
+a:2,
+e:"The rooted plant used in grafting is called the stock."
+},
+
+{
+q:"What is the inserted twig in grafting called?",
+o:["Root","Stock","Scion","Bud case"],
+a:2,
+e:"The twig attached to the stock is called the scion."
+},
+
+{
+q:"Which tissue must contact during grafting?",
+o:["Epidermis","Cambium","Phloem","Xylem"],
+a:1,
+e:"Cambium layers must touch for successful grafting."
+},
+
+{
+q:"Which plants are mostly suitable for grafting?",
+o:["Monocots","Dicots","Fungi","Algae"],
+a:1,
+e:"Dicot plants possess cambium tissue needed for grafting."
+},
+
+{
+q:"What is a clone in tissue culture?",
+o:["Different plant","Genetically identical offspring","Mutated plant","Seedling"],
+a:1,
+e:"Tissue culture produces genetically identical clones."
+},
+{
+q:"Which substance is used to solidify tissue culture media?",
+o:["Sugar","Agar","Water","Starch"],
+a:1,
+e:"Agar is commonly used to solidify tissue culture media."
+},
+
+{
+q:"Which is an advantage of tissue culture?",
+o:["Slow growth","Few plants","Mass propagation","No clones"],
+a:2,
+e:"Tissue culture allows rapid mass production of plants."
+},
+
+{
+q:"Which flower part protects the flower bud?",
+o:["Petals","Sepals","Anther","Stigma"],
+a:1,
+e:"Sepals form the calyx and protect the flower bud."
+},
+
+{
+q:"Which flower part attracts insects?",
+o:["Petals","Roots","Ovules","Stem"],
+a:0,
+e:"Colourful petals attract pollinators."
+},
+
+{
+q:"Which structure is the male reproductive part of a flower?",
+o:["Pistil","Ovary","Androecium","Sepal"],
+a:2,
+e:"The androecium consists of stamens and produces pollen."
+},
+
+{
+q:"Which structure is the female reproductive part of a flower?",
+o:["Corolla","Gynoecium","Anther","Filament"],
+a:1,
+e:"The gynoecium contains stigma, style and ovary."
+},
+
+{
+q:"Flowers with both male and female parts are called?",
+o:["Unisexual","Bisexual","Sterile","Incomplete"],
+a:1,
+e:"Bisexual flowers contain both reproductive structures."
+},
+
+{
+q:"Which is a bisexual flower?",
+o:["Shoe flower","Corn male flower","Papaw male flower","Pumpkin male flower"],
+a:0,
+e:"Shoe flower contains both male and female structures."
+},
+
+{
+q:"Flowers having only one sex are called?",
+o:["Bisexual","Unisexual","Perfect","Complete"],
+a:1,
+e:"Unisexual flowers possess only one reproductive structure."
+},
+
+{
+q:"Which plant is monoecious?",
+o:["Papaw","Pumpkin","Vallisneria","Date palm"],
+a:1,
+e:"Pumpkin bears both male and female flowers on the same plant."
+},
+
+{
+q:"Which plant is dioecious?",
+o:["Pumpkin","Corn","Papaw","Coconut"],
+a:2,
+e:"Papaw has male and female flowers on separate plants."
+},
+
+{
+q:"What is self-pollination?",
+o:["Pollen transfer between species","Pollen transfer within same flower","Seed dispersal","Fertilization"],
+a:1,
+e:"Self-pollination occurs within the same flower."
+},
+
+{
+q:"What is cross-pollination?",
+o:["Transfer between flowers of same species","Transfer between kingdoms","Seed dispersal","Fruit development"],
+a:0,
+e:"Cross-pollination occurs between flowers of the same species."
+},
+
+{
+q:"Which adaptation prevents self-pollination?",
+o:["Colourful petals","Hercogamy","Short roots","Large leaves"],
+a:1,
+e:"Hercogamy separates stigma and stamens."
+},
+
+{
+q:"What is dichogamy?",
+o:["Seed dispersal","Different flowering times","Different maturation times of stamens and pistils","Fertilization"],
+a:2,
+e:"Dichogamy reduces self-pollination."
+},
+
+{
+q:"Flowers pollinated by animals are called?",
+o:["Hydrophilous","Anemophilous","Zoophilous","Autophilous"],
+a:2,
+e:"Animal-pollinated flowers are called zoophilous."
+},
+
+{
+q:"Which adaptation attracts insects?",
+o:["Sticky pollen","Colourful petals","Fragrance","All of these"],
+a:3,
+e:"All these features attract pollinators."
+},
+
+{
+q:"Flowers pollinated by wind are called?",
+o:["Hydrophilous","Zoophilous","Anemophilous","Autophilous"],
+a:2,
+e:"Wind-pollinated flowers are known as anemophilous."
+},
+
+{
+q:"Which crop is mainly wind pollinated?",
+o:["Rose","Corn","Passion fruit","Hibiscus"],
+a:1,
+e:"Corn is pollinated mainly by wind."
+},
+
+{
+q:"Flowers pollinated by water are called?",
+o:["Hydrophilous","Zoophilous","Anemophilous","Entomophilous"],
+a:0,
+e:"Hydrophilous flowers depend on water for pollination."
+},
+
+{
+q:"Which plant is pollinated by water?",
+o:["Rose","Sunflower","Vallisneria","Mango"],
+a:2,
+e:"Vallisneria is a classic example of water pollination."
+},
+
+{
+q:"Artificial pollination can be performed using?",
+o:["Brush","Finger","Both","Neither"],
+a:2,
+e:"Artificial pollination is commonly done using fingers or brushes."
+},
+
+{
+q:"What develops from the zygote after fertilization?",
+o:["Root","Embryo","Petal","Leaf"],
+a:1,
+e:"The zygote develops into an embryo."
+},
+
+{
+q:"What does the fertilized ovule become?",
+o:["Fruit","Leaf","Seed","Flower"],
+a:2,
+e:"The fertilized ovule develops into a seed."
+},
+
+{
+q:"What is parthenocarpy?",
+o:["Seed germination","Fruit formation without fertilization","Pollination","Cloning"],
+a:1,
+e:"Parthenocarpy produces seedless fruits without fertilization."
+},
+{
+q:"Which fruit is commonly produced by parthenocarpy?",
+o:["Orange","Grapes","Apple","All of these"],
+a:3,
+e:"Seedless grapes, oranges and apples can be produced by parthenocarpy."
+},
+
+{
+q:"Why do plants disperse seeds?",
+o:["Reduce competition","Find habitats","Increase survival","All of these"],
+a:3,
+e:"Seed dispersal helps plants survive and spread."
+},
+
+{
+q:"Which fruit is dispersed by animals?",
+o:["Mango","Papaw","Banana","All of these"],
+a:3,
+e:"Animals eat these fruits and disperse their seeds."
+},
+
+{
+q:"Which adaptation helps wind dispersal?",
+o:["Hooks","Fibers","Wings","Both fibers and wings"],
+a:3,
+e:"Fibers and wings help fruits float in air."
+},
+
+{
+q:"Which plant seed is dispersed by water?",
+o:["Cotton","Coconut","Mahogany","Grass"],
+a:1,
+e:"Coconut floats due to its fibrous husk."
+},
+
+{
+q:"Which factor is NOT essential for germination?",
+o:["Water","Oxygen","Light","Suitable temperature"],
+a:2,
+e:"Light is not essential for many seeds to germinate."
+},
+
+{
+q:"What activates enzymes during germination?",
+o:["Heat","Water","Oxygen","Light"],
+a:1,
+e:"Water activates enzymes stored in seeds."
+},
+
+{
+q:"Which part emerges first during germination?",
+o:["Leaf","Flower","Radicle","Fruit"],
+a:2,
+e:"The radicle develops into the root."
+},
+
+{
+q:"What is seed dormancy?",
+o:["Rapid germination","Failure to germinate","Pollination","Fertilization"],
+a:1,
+e:"Dormancy prevents germination under unsuitable conditions."
+},
+
+{
+q:"Which method removes dormancy?",
+o:["Removing seed coat","Hot water treatment","Storage","All of these"],
+a:3,
+e:"Several methods can break seed dormancy."
+},
+
+{
+q:"Which germination keeps cotyledons below ground?",
+o:["Epigeal","Hypogeal","Aerial","Vegetative"],
+a:1,
+e:"Hypogeal germination keeps cotyledons underground."
+},
+
+{
+q:"Which plant shows hypogeal germination?",
+o:["Bean","Tamarind","Corn","Sunflower"],
+a:2,
+e:"Corn is an example of hypogeal germination."
+},
+
+{
+q:"Which germination brings cotyledons above ground?",
+o:["Hypogeal","Epigeal","Asexual","Vegetative"],
+a:1,
+e:"Epigeal germination lifts cotyledons above soil."
+},
+
+{
+q:"Which plant shows epigeal germination?",
+o:["Bean","Corn","Coconut","Paddy"],
+a:0,
+e:"Bean plants show epigeal germination."
+},
+
+{
+q:"Puberty is also known as?",
+o:["Childhood","Adolescence","Infancy","Old age"],
+a:1,
+e:"Puberty marks the beginning of adolescence."
+},
+
+{
+q:"Which hormone causes deep voice in boys?",
+o:["Oestrogen","Insulin","Testosterone","Progesterone"],
+a:2,
+e:"Testosterone causes secondary male characteristics."
+},
+
+{
+q:"Which female organ releases ova?",
+o:["Uterus","Ovary","Kidney","Vagina"],
+a:1,
+e:"Ovaries produce and release ova."
+},
+
+{
+q:"Which characteristic appears during female puberty?",
+o:["Broad shoulders","Deep voice","Mammary gland development","Beard growth"],
+a:2,
+e:"Breast development is a female secondary sexual characteristic."
+},
+
+{
+q:"Which characteristic appears during male puberty?",
+o:["Menstruation","Beard growth","Ovum release","Widening hips"],
+a:1,
+e:"Facial hair growth is a male secondary sexual characteristic."
+},
+
+{
+q:"How many chambers are present in a mammalian heart?",
+o:["2","3","4","5"],
+a:2,
+e:"Mammals possess a four-chambered heart."
+},
+
+{
+q:"Which vertebrate group has feathers?",
+o:["Reptilia","Aves","Mammalia","Amphibia"],
+a:1,
+e:"Feathers are unique characteristics of birds."
+},
+
+{
+q:"Which vertebrate group has mammary glands?",
+o:["Aves","Pisces","Mammalia","Reptilia"],
+a:2,
+e:"Mammary glands are a defining feature of mammals."
+},
+
+{
+q:"Which vertebrate group breathes through lungs and moist skin?",
+o:["Amphibia","Pisces","Aves","Mammalia"],
+a:0,
+e:"Amphibians use lungs and moist skin for respiration."
+},
+
+{
+q:"Which vertebrate group has scales and lungs?",
+o:["Reptilia","Aves","Amphibia","Mammalia"],
+a:0,
+e:"Reptiles have dry scales and breathe using lungs."
+},
+
+{
+q:"Which domain contains plants, animals, fungi and protists?",
+o:["Bacteria","Archaea","Eukarya","Virus"],
+a:2,
+e:"Eukarya contains all eukaryotic organisms."
+}
+];
+let current=0;
+let score=0;
+let xp=0;
+let answered=false;
+
+const question=document.getElementById("question");
+const options=document.getElementById("options");
+const explanation=document.getElementById("explanation");
+
+function getRank(){
+
+if(score>=95) return "LifeSphere Legend";
+if(score>=85) return "Master";
+if(score>=70) return "Expert";
+if(score>=50) return "Scholar";
+if(score>=25) return "Learner";
+
+return "Beginner";
+}
+
+function loadQuestion(){
+
+answered=false;
+
+const q=quiz[current];
+
+question.innerHTML=
+`Q${current+1}. ${q.q}`;
+
+options.innerHTML="";
+
+explanation.style.display="none";
+
+q.o.forEach((opt,index)=>{
+
+const btn=document.createElement("button");
+
+btn.className="option";
+
+btn.innerText=opt;
+
+btn.onclick=()=>checkAnswer(index);
+
+options.appendChild(btn);
+
+});
+
+document.getElementById("qnum").innerText=
+`${current+1}/${quiz.length}`;
+
+document.getElementById("progress").style.width=
+((current)/quiz.length*100)+"%";
+
+}
+
+function checkAnswer(selected){
+
+if(answered)return;
+
+answered=true;
+
+const q=quiz[current];
+
+const btns=
+document.querySelectorAll(".option");
+
+if(selected===q.a){
+
+btns[selected].classList.add("correct");
+
+score++;
+xp+=50;
+
+}else{
+
+btns[selected].classList.add("wrong");
+btns[q.a].classList.add("correct");
+
+xp+=10;
+}
+
+document.getElementById("score").innerText=
+score;
+
+document.getElementById("xp").innerText=
+xp;
+
+document.getElementById("rank").innerText=
+getRank();
+
+explanation.innerHTML=
+`
+<h3>Explanation</h3>
+<p>${q.e}</p>
+`;
+
+explanation.style.display="block";
+
+}
+
+function nextQuestion(){
+
+if(current<quiz.length-1){
+
+current++;
+loadQuestion();
+
+}else{
+
+showResults();
+
+}
+
+}
+
+function showResults(){
+
+document.getElementById("quizArea").style.display="none";
+
+document.getElementById("result").style.display="block";
+
+const accuracy=
+((score/quiz.length)*100).toFixed(1);
+
+document.getElementById("finalScore").innerHTML=
+`Score: ${score}/${quiz.length}`;
+
+document.getElementById("accuracy").innerHTML=
+`Accuracy: ${accuracy}%`;
+
+document.getElementById("finalRank").innerHTML=
+getRank();
+
+}
+
+loadQuestion();
+
+</script>
+<script>
+window.addEventListener("load", () => {
+
+    setTimeout(() => {
+
+        const intro = document.getElementById("intro");
+
+        if(intro){
+            intro.style.opacity = "0";
+
+            setTimeout(()=>{
+                intro.remove();
+            },1000);
+        }
+
+    },2500);
+
+});
+</script>
+
+</body>
+</html>
